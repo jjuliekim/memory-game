@@ -1,8 +1,9 @@
 package me.julie.memorygame;
 
 public class Card {
-    private int value;
+    private final int value;
     private boolean flipped;
+    private boolean matched;
 
     public Card(int value) {
         this.value = value;
@@ -20,4 +21,11 @@ public class Card {
         flipped = !flipped;
     }
 
+    public boolean isMatched() {
+        return matched;
+    }
+
+    public void setMatched(boolean matched) {
+        this.matched = matched;
+    }
 }

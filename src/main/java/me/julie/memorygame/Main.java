@@ -7,25 +7,38 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 
 public class Main extends Application {
-    static Difficulty difficulty = Difficulty.EASY;
+    private static Difficulty difficulty;
+    private static Main instance;
+    private Stage mainStage;
 
     @Override
     public void start(Stage stage) throws IOException {
-        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("memory.fxml"));
+        instance = this;
+        mainStage = stage;
+        FXMLLoader fxmlLoader = new FXMLLoader(Main.class.getResource("menu.fxml"));
         Scene scene = fxmlLoader.load();
-        stage.setTitle("Memory Game");
-        stage.setScene(scene);
-        stage.show();
+        mainStage.setTitle("Memory Game");
+        mainStage.setScene(scene);
+        mainStage.show();
     }
 
     public static void main(String[] args) {
         launch();
     }
 
+    public static Main getInstance() {
+        return instance;
+    }
+
     public static Difficulty getDifficulty() {
         return difficulty;
+    }
+
+    public static void setDifficulty(Difficulty difficulty) {
+        Main.difficulty = difficulty;
     }
 
     public static void delay(long millis, Runnable continuation) {
@@ -42,5 +55,25 @@ public class Main extends Application {
         };
         sleeper.setOnSucceeded(event -> continuation.run());
         new Thread(sleeper).start();
+    }
+
+    public void loadMemory() {
+        try {
+            final Scene scene = FXMLLoader.load(Objects.requireNonNull(getClass()
+                    .getResource("memory.fxml")));
+            mainStage.setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    public void loadMenu() {
+        try {
+            final Scene scene = FXMLLoader.load(Objects.requireNonNull(getClass()
+                    .getResource("menu.fxml")));
+            mainStage.setScene(scene);
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 }

@@ -1,7 +1,10 @@
 package me.julie.memorygame;
 
 import javafx.fxml.FXML;
+import javafx.scene.Parent;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.VBox;
@@ -99,6 +102,25 @@ public class MemoryController {
             numFlipped = 0;
             checkMatch();
         }
+
+        if (numLeft == 0) {
+            for (int i = 0; i < grid.getColumnCount(); i++) {
+                for (int j = 0; j < grid.getRowCount(); j++) {
+                    color = colors.get(cards[i][j].getValue() - 1);
+                    hex = colorToHex(color);
+                    grid.getChildren().get(i * grid.getRowCount() + j).setStyle("-fx-background-color: " + hex);
+                }
+            }
+            Main.delay(700, () -> {
+                Alert alert = new Alert(Alert.AlertType.NONE);
+                alert.getButtonTypes().add(ButtonType.OK);
+                alert.setWidth(80);
+                alert.setTitle("Memory Game");
+                alert.setContentText("You won!\nLet's play again!");
+                alert.showAndWait();
+                Main.getInstance().loadMenu();
+            });
+        }
     }
 
     public static String colorToHex(Color color) {
@@ -128,67 +150,57 @@ public class MemoryController {
     }
 
     private void checkMatch() {
-        Card first;
-        Card second;
-        int firstK = -1;
-        int firstL = -1;
+        Card first = null;
+        int firstCol = 0;
+        int firstRow = 0;
 
-        for (int i = 0; i < grid.getColumnCount(); i++) {
-            for (int j = 0; j < grid.getRowCount(); j++) {
-                if (cards[i][j].isFlipped() && !(firstK == i && firstL == j)) {
-                    first = cards[i][j];
-
-                    System.out.println("first: " + i + ", " + j);
-                    for (int k = 0; k < grid.getColumnCount(); k++) {
-                        for (int l = 0; l < grid.getRowCount(); l++) {
-                            if (cards[k][l].isFlipped() && !(k == i && l == j)) {
-                                second = cards[k][l];
-                                firstK = k;
-                                firstL = l;
-                                System.out.println("second: " + k + ", " + l);
-
-                                if (first.getValue() == second.getValue()) {
-                                    System.out.println(1);
-                                    numLeft--;
-                                    numLeftLabel.setText(String.valueOf(numLeft));
-                                    int finalI = i;
-                                    int finalJ = j;
-                                    int finalK = k;
-                                    int finalL = l;
-
-                                    Main.delay(500, () -> {
-                                        grid.getChildren().get(finalI * grid.getRowCount() + finalJ)
-                                                .setStyle("-fx-background-color: #6f6f6f"); // same as background
-                                        grid.getChildren().get(finalK * grid.getRowCount() + finalL)
-                                                .setStyle("-fx-background-color: #6f6f6f");
-                                    });
-                                } else {
-                                    System.out.println(2);
-                                    cards[i][j].flip();
-                                    cards[k][l].flip();
-                                    int finalI1 = i;
-                                    int finalJ1 = j;
-                                    int finalL1 = l;
-                                    int finalK1 = k;
-                                    Main.delay(500, () -> {
-                                        grid.getChildren().get(finalI1 * grid.getRowCount() + finalJ1)
-                                                .setStyle("-fx-background-color: white");
-                                        grid.getChildren().get(finalK1 * grid.getRowCount() + finalL1)
-                                                .setStyle("-fx-background-color: white");
-                                    });
-                                }
-                                if (numLeft == 0) {
-                                    // stop timer, game over
-                                }
-                            }
-                        }
-                    }
+        for (int col = 0; col < grid.getColumnCount(); col++) {
+            for (int row = 0; row < grid.getRowCount(); row++) {
+                if (!cards[col][row].isFlipped() || cards[col][row].isMatched()) {
+                    continue;
                 }
+                if (first == null) {
+                    first = cards[col][row];
+                    firstCol = col;
+                    firstRow = row;
+                    continue;
+                }
+                final Card second = cards[col][row];
+
+                if (first.getValue() == second.getValue()) {
+                    first.setMatched(true);
+                    second.setMatched(true);
+                    numLeft--;
+                    numLeftLabel.setText(String.valueOf(numLeft));
+                    final int finalFirstCol = firstCol;
+                    final int finalFirstRow = firstRow;
+                    final int finalSecondCol = col;
+                    final int finalSecondRow = row;
+                    if (numLeft == 0) {
+                        return;
+                    }
+                    Main.delay(700, () -> {
+                        grid.getChildren().get(finalFirstCol * grid.getRowCount() + finalFirstRow)
+                                .setStyle("-fx-background-color: #6f6f6f"); // same as background
+                        grid.getChildren().get(finalSecondCol * grid.getRowCount() + finalSecondRow)
+                                .setStyle("-fx-background-color: #6f6f6f");
+                    });
+                } else {
+                    final int finalFirstCol1 = firstCol;
+                    final int finalFirstRow1 = firstRow;
+                    final int finalSecondCol1 = col;
+                    final int finalSecondRow1 = row;
+                    cards[firstCol][firstRow].flip();
+                    cards[col][row].flip();
+                    Main.delay(700, () -> {
+                        grid.getChildren().get(finalFirstCol1 * grid.getRowCount() + finalFirstRow1)
+                                .setStyle("-fx-background-color: white");
+                        grid.getChildren().get(finalSecondCol1 * grid.getRowCount() + finalSecondRow1)
+                                .setStyle("-fx-background-color: white");
+                    });
+                }
+                break;
             }
         }
-
-
     }
-
-
 }
