@@ -6,8 +6,7 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.layout.GridPane;
-import javafx.scene.layout.VBox;
+import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
 
 import java.util.ArrayList;
@@ -37,18 +36,28 @@ public class MemoryController {
         timeLabel.setText("00:00");
         mainVBox.setStyle("-fx-background-color: #6f6f6f");
         if (Main.getDifficulty().equals(Difficulty.MEDIUM)) { // 20 cells
-            grid.addColumn(1);
-            grid.addRow(1);
+            ColumnConstraints columnConstraints = new ColumnConstraints();
+            columnConstraints.setHgrow(Priority.NEVER);
+            grid.getColumnConstraints().add(columnConstraints);
+            RowConstraints rowConstraints = new RowConstraints();
+            rowConstraints.setVgrow(Priority.NEVER);
+            grid.getRowConstraints().add(rowConstraints);
             cards = new Card[5][4];
             numLeft = 10;
             values = new ArrayList<>(Arrays.asList(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10));
             colors = new ArrayList<>(Arrays.asList(Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE,
                     Color.PURPLE, Color.PINK, Color.BROWN, Color.LIGHTBLUE, Color.BEIGE));
         } else if (Main.getDifficulty().equals(Difficulty.HARD)) { // 30 cells
-            grid.addColumn(1);
-            grid.addColumn(1);
-            grid.addRow(1);
-            grid.addRow(1);
+            ColumnConstraints col1 = new ColumnConstraints();
+            col1.setHgrow(Priority.NEVER);
+            ColumnConstraints col2 = new ColumnConstraints();
+            col2.setHgrow(Priority.NEVER);
+            grid.getColumnConstraints().addAll(col1, col2);
+            RowConstraints row1 = new RowConstraints();
+            row1.setVgrow(Priority.NEVER);
+            RowConstraints row2 = new RowConstraints();
+            row2.setVgrow(Priority.NEVER);
+            grid.getRowConstraints().addAll(row1, row2);
             cards = new Card[6][5];
             numLeft = 15;
             values = new ArrayList<>(Arrays.asList(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6, 7, 7, 8, 8, 9, 9, 10, 10,
@@ -56,7 +65,7 @@ public class MemoryController {
             colors = new ArrayList<>(Arrays.asList(Color.RED, Color.ORANGE, Color.YELLOW, Color.GREEN, Color.BLUE,
                     Color.PURPLE, Color.PINK, Color.BROWN, Color.LIGHTBLUE, Color.GRAY, Color.MAROON,
                     Color.LIGHTGREEN, Color.BEIGE, Color.DARKCYAN, Color.DARKORANGE));
-        } else { // easy = 4 x 3 = 12 cells
+        } else { // easy = (4 x 3) = 12 cells
             cards = new Card[4][3];
             numLeft = 6;
             values = new ArrayList<>(Arrays.asList(1, 1, 2, 2, 3, 3, 4, 4, 5, 5, 6, 6));
