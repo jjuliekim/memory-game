@@ -1,5 +1,9 @@
 package me.julie.memorygame;
 
+import javafx.animation.KeyFrame;
+import javafx.animation.Timeline;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.Parent;
 import javafx.scene.control.Alert;
@@ -8,9 +12,11 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Random;
 
 public class MemoryController {
@@ -26,14 +32,25 @@ public class MemoryController {
     private Card[][] cards;
     private int numFlipped;
     private int numLeft;
-    private ArrayList<Integer> values;
-    private ArrayList<Color> colors;
+    private List<Integer> values;
+    private List<Color> colors;
     private Random random;
+    private Boolean firstCard;
+    private Timeline timer;
+    private int seconds;
 
     @FXML
     public void initialize() {
+        firstCard = true;
         random = new Random();
-        timeLabel.setText("00:00");
+        seconds = 0;
+        timer = new Timeline(
+                new KeyFrame(Duration.seconds(1), (e) -> {
+                    seconds++;
+                    updateTimer();
+                }));
+        timer.setCycleCount(Timeline.INDEFINITE);
+        updateTimer();
         mainVBox.setStyle("-fx-background-color: #6f6f6f");
         if (Main.getDifficulty().equals(Difficulty.MEDIUM)) { // 20 cells
             ColumnConstraints columnConstraints = new ColumnConstraints();
@@ -76,6 +93,13 @@ public class MemoryController {
         setButtons();
     }
 
+    private void updateTimer() {
+        int minutes = seconds / 60;
+        int newSeconds = seconds % 60;
+        String formatted = String.format("%02d:%02d", minutes, newSeconds);
+        timeLabel.setText(formatted);
+    }
+
     private void setButtons() {
         for (int i = 0; i < grid.getColumnCount(); i++) {
             for (int j = 0; j < grid.getRowCount(); j++) {
@@ -97,6 +121,11 @@ public class MemoryController {
     }
 
     private void flipCard(int col, int row) {
+        if (firstCard) {
+            firstCard = false;
+            timer.play();
+        }
+
         if (cards[col][row].isFlipped()) {
             return;
         }
@@ -113,6 +142,7 @@ public class MemoryController {
         }
 
         if (numLeft == 0) {
+            timer.stop();
             for (int i = 0; i < grid.getColumnCount(); i++) {
                 for (int j = 0; j < grid.getRowCount(); j++) {
                     color = colors.get(cards[i][j].getValue() - 1);
@@ -125,7 +155,7 @@ public class MemoryController {
                 alert.getButtonTypes().add(ButtonType.OK);
                 alert.setWidth(80);
                 alert.setTitle("Memory Game");
-                alert.setContentText("You won!\nLet's play again!");
+                alert.setContentText("You won!\nLet's play again!\nYour time was: " + timeLabel.getText());
                 alert.showAndWait();
                 Main.getInstance().loadMenu();
             });
