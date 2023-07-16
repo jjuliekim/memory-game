@@ -2,10 +2,7 @@ package me.julie.memorygame;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.event.ActionEvent;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Parent;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -111,9 +108,7 @@ public class MemoryController {
                 button.setStyle("-fx-background-color: white");
                 int finalI = i;
                 int finalJ = j;
-                button.setOnAction(e -> {
-                    flipCard(finalI, finalJ);
-                });
+                button.setOnAction(e -> flipCard(finalI, finalJ));
                 grid.add(button, i, j);
                 cards[i][j] = new Card(values.remove(random.nextInt(values.size())));
             }
@@ -173,13 +168,7 @@ public class MemoryController {
         String alphaHex = To00Hex(255);
 
         // hexBinary value: RRGGBBAA
-        StringBuilder str = new StringBuilder("#");
-        str.append(redHex);
-        str.append(greenHex);
-        str.append(blueHex);
-        str.append(alphaHex);
-
-        return str.toString();
+        return "#" + redHex + greenHex + blueHex + alphaHex;
     }
 
     private static String To00Hex(int value) {
